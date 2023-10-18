@@ -16,23 +16,24 @@
       <button class="article__button" id="procesar" type="button">procesar</button>
     </article>
   </section>
-  <section class="output">
-    <h2 class="output__title">Salida</h2>
-    <p class="output__data"></p>
+  <section class="output" style="display: none;">
+    <article class="lista">
+      <h2 class="lista__title">Resultados</h2>
+      <p class="lista__data"></p>
+    </article>
+    <article class="grafico">
+      <h2 class="grafico__title">Gráfico</h2>
+      <div id="grafico"></div>
+    </article>
   </section>
-  <div id="grafico"></div>
   <script>
   const graficar = results => {
-    const dataTable = [['numero', 'repeticiones']];
-    const tmp = results.map(r => [r.num, r.repeat]);
-    dataTable.push(...tmp);
 
-    google.charts.load('current', {'packages': ['corechart']});
-    google.charts.setOnLoadCallback(dibujarGrafico);
-
-    function dibujarGrafico() {
-      var data = google.visualization.arrayToDataTable(dataTable);
-
+    const dibujarGrafico = () => {
+      const dataTable = [['numero', 'repeticiones']];
+      const tmp = results.map(({num, repeat}) => [num, repeat]);
+      dataTable.push(...tmp);
+      const data = google.visualization.arrayToDataTable(dataTable);
       const options = {
         title: 'Datos Repetidos',
         width: 600,
@@ -42,14 +43,17 @@
       const chart = new google.visualization.ColumnChart(document.getElementById('grafico'));
       chart.draw(data, options);
     }
+
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(dibujarGrafico);
   }
-  document.querySelector('#autocomplete').addEventListener('click', () => {
+  document.getElementById('autocomplete').addEventListener('click', () => {
     const size = 90;
-    document.querySelector('#input__numbers').value = generateNumbers(size).join(', ');
+    document.getElementById('input__numbers').value = generateNumbers(size).join(', ');
   })
 
-  document.querySelector('#procesar').addEventListener('click', () => {
-    const numberStr = document.querySelector('#input__numbers').value;
+  document.getElementById('procesar').addEventListener('click', () => {
+    const numberStr = document.getElementById('input__numbers').value;
     const numbers = numberStr.split(', ');
     const results = procesar(numbers);
 
@@ -62,15 +66,10 @@
     resultStr += num + ': ' + repeat + '<br>';
     });
     resultStr += `La moda con ${maxRepe} repeticiones ${moda.length > 1 ? 'son' : 'es'}: ${moda.join(', ')}`;
-    document.querySelector('.output__data').innerHTML = resultStr;
+    document.querySelector('.output').style.display = 'flex';
+    document.querySelector('.lista__data').innerHTML = resultStr;
     graficar(results);
   })
-
-  const autocomplete = () => {
-    document.querySelector('#autocomplete').click();
-    document.querySelector('#procesar').click();
-  }
-  autocomplete();
 
   </script>
 </body>
