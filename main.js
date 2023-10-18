@@ -22,11 +22,9 @@ const procesar = numbers => {
   let dsp;
   numbers = numbers.sort();
   let [ant] = numbers;
-  console.log(numbers.toString());
 
   for (let i = 1; i < numbers.length; i++) {
     dsp = numbers[i];
-    console.log(ant, dsp);
     if(ant === dsp){
       counter++;
     } else{

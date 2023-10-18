@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Reto</title>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src="main.js"></script>
 </head>
 <body>
   <section class="input">
@@ -14,36 +16,61 @@
       <button class="article__button" id="procesar" type="button">procesar</button>
     </article>
   </section>
-  <div class="output">
+  <section class="output">
     <h2 class="output__title">Salida</h2>
     <p class="output__data"></p>
-  </div>
-  <canvas></canvas>
-  <script src="main.js"></script>
+  </section>
+  <div id="grafico"></div>
   <script>
-    document.querySelector('#autocomplete').addEventListener('click', () => {
-      const size = 90;
-      document.querySelector('#input__numbers').value = generateNumbers(size).join(', ');
-    })
+  const graficar = results => {
+    const dataTable = [['numero', 'repeticiones']];
+    const tmp = results.map(r => [r.num, r.repeat]);
+    dataTable.push(...tmp);
 
-    document.querySelector('#procesar').addEventListener('click', () => {
-      const numberStr = document.querySelector('#input__numbers').value;
-      console.log(numberStr);
-      const numbers = numberStr.split(', ');
-      let resultStr = '';
-      const results = procesar(numbers);
-      const output = document.querySelector('.output__data');
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(dibujarGrafico);
 
-      const repeticiones = results.map(res => res.repeat);
-      const maxRepe = repeticiones.reduce((acc, curr) => (acc < curr) ? curr : acc, repeticiones[0]);
-      const moda = results.filter(res => res.repeat == maxRepe).map(m => m.num);
+    function dibujarGrafico() {
+      var data = google.visualization.arrayToDataTable(dataTable);
 
-      results.forEach(({num, repeat}) => {
-        resultStr += num + ': ' + repeat + '<br>';
-      });
-      resultStr += `La moda con ${maxRepe} repeticiones ${moda.length > 1 ? 'son' : 'es'}: ${moda.join(', ')}`;
-      output.innerHTML = resultStr;
-    })
+      const options = {
+        title: 'Datos Repetidos',
+        width: 600,
+        height: 400
+      };
+
+      const chart = new google.visualization.ColumnChart(document.getElementById('grafico'));
+      chart.draw(data, options);
+    }
+  }
+  document.querySelector('#autocomplete').addEventListener('click', () => {
+    const size = 90;
+    document.querySelector('#input__numbers').value = generateNumbers(size).join(', ');
+  })
+
+  document.querySelector('#procesar').addEventListener('click', () => {
+    const numberStr = document.querySelector('#input__numbers').value;
+    const numbers = numberStr.split(', ');
+    const results = procesar(numbers);
+
+    const repeticiones = results.map(res => res.repeat);
+    const maxRepe = repeticiones.reduce((acc, curr) => (acc < curr) ? curr : acc, repeticiones[0]);
+    const moda = results.filter(res => res.repeat == maxRepe).map(m => m.num);
+
+    let resultStr = '';
+    results.forEach(({num, repeat}) => {
+    resultStr += num + ': ' + repeat + '<br>';
+    });
+    resultStr += `La moda con ${maxRepe} repeticiones ${moda.length > 1 ? 'son' : 'es'}: ${moda.join(', ')}`;
+    document.querySelector('.output__data').innerHTML = resultStr;
+    graficar(results);
+  })
+
+  const autocomplete = () => {
+    document.querySelector('#autocomplete').click();
+    document.querySelector('#procesar').click();
+  }
+  autocomplete();
 
   </script>
 </body>
