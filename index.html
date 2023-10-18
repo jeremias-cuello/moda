@@ -10,13 +10,12 @@
     <article class="input__article">
       <h3 class="article__title">Números</h3>
       <textarea type="text" class="article__data" id="input__numbers" style="width: 700px; height: 50px;"></textarea>
-      <button class="article__button" id="autocomplete" type="button">Autocompleatar</button>
+      <button class="article__button" id="autocomplete" type="button">Autocompletar</button>
       <button class="article__button" id="procesar" type="button">procesar</button>
     </article>
   </section>
   <div class="output">
     <h2 class="output__title">Salida</h2>
-    <h3 class="output__section">Conjunto</h3>
     <p class="output__data"></p>
   </div>
   <canvas></canvas>
@@ -33,21 +32,17 @@
       const numbers = numberStr.split(', ');
       let resultStr = '';
       const results = procesar(numbers);
+      const output = document.querySelector('.output__data');
+
+      const repeticiones = results.map(res => res.repeat);
+      const maxRepe = repeticiones.reduce((acc, curr) => (acc < curr) ? curr : acc, repeticiones[0]);
+      const moda = results.filter(res => res.repeat == maxRepe).map(m => m.num);
+
       results.forEach(({num, repeat}) => {
         resultStr += num + ': ' + repeat + '<br>';
       });
-      const output = document.querySelector('.output__data');
+      resultStr += `La moda con ${maxRepe} repeticiones ${moda.length > 1 ? 'son' : 'es'}: ${moda.join(', ')}`;
       output.innerHTML = resultStr;
-
-      const moda = results.reduce((acc, curr) => {
-        if(acc.repeat < curr.repeat){
-          return curr;
-        } else {
-          return acc;
-        }
-      }, results[0]);
-
-      output.innerHTML += `La moda es: ${moda.num} con ${moda.repeat} repeticiones`;
     })
 
   </script>
